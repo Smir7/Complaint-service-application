@@ -3,11 +3,13 @@ package repository
 import "github.com/jmoiron/sqlx"
 
 type ComplaintsRepository struct {
-	db *sqlx.DB
+	Authorization
 }
 
 func CreateComplaintsRepository(db *sqlx.DB) *ComplaintsRepository {
-	return &ComplaintsRepository{db: db}
+	return &ComplaintsRepository{
+		Authorization: NewAuthPostgres(db),
+	}
 }
 
 // Ниже будут методы ComplaintsRepository, которые делают запросы в БД и отдают результат

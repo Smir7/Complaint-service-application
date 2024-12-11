@@ -1,11 +1,14 @@
 package main
 
 import (
-	"complaint_service/internal/config"
+	"complaint_service/internal/api/handlers"
+	"complaint_service/internal/processors"
+	"complaint_service/internal/repository"
 	"log/slog"
 	"os"
 
 	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 const port = ":8080"
@@ -22,10 +25,10 @@ func main() {
 			slog.String("где вылезла ошибка", op),
 		)
 	*/
-	cfg := config.NewConfig()
-	log := setupLogger(cfg.Env)
-	log.Info("Starting project", slog.String("env", cfg.Env))
-	log.Debug("debug messages are enabled", slog.String("env", cfg.Env))
+	// cfg := config.NewConfig()
+	// log := setupLogger(cfg.Env)
+	// log.Info("Starting project", slog.String("env", cfg.Env))
+	// log.Debug("debug messages are enabled", slog.String("env", cfg.Env))
 	/*
 		Инициализируем БД. И коннект прокидываем в CreateComplaintsRepository
 		complaintsRepository := repository.CreateComplaintsRepository(db)
@@ -37,7 +40,19 @@ func main() {
 		complaintsHandler := handlers.CreateComplaintsHandler(complaintsProcessor)
 	*/
 
+	db, err := repository.NewPostgresDB()
+
+	if err != nil {
+		log.Error("Create database error: %v", err)
+	}
+
+	repo := repository.CreateComplaintsRepository(db)
+	service := processors.CreateComplaintsProcessor(repo)
+	h := handlers.CreateComplaintsHandler(service)
+
 	app := fiber.New()
+
+	h.InitRoutes(app)
 
 	/*
 		Подключаем роуты. Прокидываем инициализированные хендлеры complaintsHandler
