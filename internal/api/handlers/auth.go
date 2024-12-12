@@ -23,6 +23,7 @@ func (h *ComplaintsHandler) signUp(c *fiber.Ctx) {
 
 	c.Status(fiber.StatusOK)
 	c.JSONP(map[string]interface{}{
-		"id": id,
+		"status":  "успешная регистрация",
+		"user_id": id,
 	})
 }

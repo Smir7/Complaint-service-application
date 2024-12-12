@@ -9,7 +9,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-const salt = "adf78adf78adf7ad78f"
+const salt = "afdafadfadfadf"
 
 type Authorization interface {
 	CreateUser(user entity.User) (int, error)
@@ -26,6 +26,9 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 func (s *AuthService) CreateUser(user entity.User) (int, error) {
 	user.Password = generatePasswordHash(user.Password)
 	user.User_UUID = uuid.NewV4()
+	if len(user.Password) == 0 || len(user.Username) == 0 {
+		return 0, fmt.Errorf("Username or password can't be empty")
+	}
 	return s.repo.CreateUser(user)
 }
 
