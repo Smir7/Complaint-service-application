@@ -24,12 +24,6 @@ func main() {
 		log := log.With(
 			slog.String("где вылезла ошибка", op),
 		)
-	*/
-	// cfg := config.NewConfig()
-	// log := setupLogger(cfg.Env)
-	// log.Info("Starting project", slog.String("env", cfg.Env))
-	// log.Debug("debug messages are enabled", slog.String("env", cfg.Env))
-	/*
 		Инициализируем БД. И коннект прокидываем в CreateComplaintsRepository
 		complaintsRepository := repository.CreateComplaintsRepository(db)
 
