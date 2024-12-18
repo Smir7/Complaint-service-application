@@ -7,6 +7,11 @@ import (
 	_ "github.com/lib/pq"
 )
 
+const (
+	usersTable   = "users"
+	reportsTable = "reports"
+)
+
 func NewPostgresDB() (*sqlx.DB, error) {
 	dbConnectString := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
 		"localhost", "5432", "postgres", "complaint_service", "qwerty", "disable")

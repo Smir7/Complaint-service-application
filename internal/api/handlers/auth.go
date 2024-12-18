@@ -57,3 +57,45 @@ func (h *ComplaintsHandler) signUp(c *fiber.Ctx) {
 		log.Println(err)
 	}
 }
+
+func (h *ComplaintsHandler) signIn(c *fiber.Ctx) {
+	var input entity.User
+
+	type Response struct {
+		Token  string `json:"token"`
+		Status string `json:"status"`
+	}
+
+	if err := c.BodyParser(&input); err != nil {
+		err = c.Status(fiber.StatusBadRequest).JSONP(
+			Response{
+				Token:  "",
+				Status: badRequest,
+			})
+		if err != nil {
+			log.Println(err)
+		}
+		return
+	}
+	token, err := h.complaintsProcessor.Authorization.GenerateToken(input.Username, input.Password)
+	if err != nil {
+		err = c.Status(fiber.StatusInternalServerError).JSONP(
+			Response{
+				Token:  "",
+				Status: fmt.Sprintf("%v: %v", serverError, err),
+			})
+		if err != nil {
+			log.Println(err)
+		}
+		return
+	}
+
+	err = c.Status(fiber.StatusOK).JSONP(
+		Response{
+			Token:  token,
+			Status: successfulReg,
+		})
+	if err != nil {
+		log.Println(err)
+	}
+}

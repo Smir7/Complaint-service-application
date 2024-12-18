@@ -9,13 +9,14 @@ import (
 
 type Authorization interface {
 	CreateUser(user entity.User) (int, error)
+	GetUser(username, password string) (entity.User, error)
 }
 
 type AuthPostgres struct {
 	db *sqlx.DB
 }
 
-// Функция NewAuthPostgres является конструктором структуры AuthPostgres. Принимает на вход переменную типа sqlx.DB и возвращает AuthPostgres.
+// Функция NewAuthPostgres является конструктором структуры AuthPostgres. Принимает на вход переменную типа sqlx.DB и возвращает AuthPostgres
 func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
 	return &AuthPostgres{db: db}
 }
@@ -31,4 +32,12 @@ func (r *AuthPostgres) CreateUser(user entity.User) (int, error) {
 		return 0, err
 	}
 	return id, nil
+}
+
+func (r *AuthPostgres) GetUser(username, password string) (entity.User, error) {
+	var user entity.User
+	query := fmt.Sprintf("SELECT id FROM %s WHERE username=$1 AND password_hash=$2", usersTable)
+	err := r.db.Get(&user, query, username, password)
+
+	return user, err
 }

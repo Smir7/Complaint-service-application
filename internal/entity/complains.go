@@ -1,6 +1,10 @@
 package entity
 
-import uuid "github.com/satori/go.uuid"
+import (
+	"time"
+
+	uuid "github.com/satori/go.uuid"
+)
 
 type User struct {
 	Id        int       `json:"id"`
@@ -8,4 +12,12 @@ type User struct {
 	Username  string    `json:"username"`
 	Password  string    `json:"password"`
 	Role      string    `json:"role"`
+}
+
+type userSessions struct {
+	Id        int       `json:"id"`
+	Username  string    `json:"username"`
+	Password  string    `json:"password"`
+	Token     string    `json:"token"`
+	CreatedAt time.Time `json:"createdAt"`
 }
