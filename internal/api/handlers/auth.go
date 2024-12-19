@@ -77,7 +77,7 @@ func (h *ComplaintsHandler) signIn(c *fiber.Ctx) {
 		}
 		return
 	}
-	token, err := h.complaintsProcessor.Authorization.GenerateToken(input.Username, input.Password)
+	token, err := h.complaintsProcessor.Authorization.GetToken(input.Username, input.Password)
 	if err != nil {
 		err = c.Status(fiber.StatusInternalServerError).JSONP(
 			Response{

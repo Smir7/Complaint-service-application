@@ -4,6 +4,7 @@ import (
 	"complaint_service/internal/entity"
 	"complaint_service/internal/repository"
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -24,16 +25,18 @@ type tokenClaims struct {
 
 type Authorization interface {
 	CreateUser(user entity.User) (int, error)
-	GenerateToken(username, password string) (string, error)
+	GetToken(username, password string) (string, error)
 }
 
 type AuthService struct {
-	repo repository.Authorization
+	repo  repository.Authorization
+	cache repository.Cache
 }
 
 // Функция NewAuthService является конструктором структуры AuthService. Принимает на вход переменную типа repository.Authorization и возвращает AuthService
 func NewAuthService(repo repository.Authorization) *AuthService {
-	return &AuthService{repo: repo}
+	return &AuthService{repo: repo,
+		cache: *repository.NewCache()}
 }
 
 /*
@@ -53,7 +56,7 @@ func (s *AuthService) CreateUser(user entity.User) (int, error) {
 func (s *AuthService) GenerateToken(username, password string) (string, error) {
 	user, err := s.repo.GetUser(username, generatePasswordHash(password))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("GenerateToken: %v", err)
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
@@ -64,16 +67,34 @@ func (s *AuthService) GenerateToken(username, password string) (string, error) {
 		user.User_UUID,
 	})
 
-	hash := sha256.New()
-	hash.Write([]byte(signingKey))
-
-	return token.SignedString(hash)
+	return token.SignedString([]byte(signingKey))
 }
 
 func (s *AuthService) GetToken(username, password string) (string, error) {
-	// Check cache
+	token, err := s.GenerateToken(username, password)
+	if err != nil {
+		return "", fmt.Errorf("GetToken 1: %v", err)
+	}
 
-	//if not in cache GenerateToken and save in cache
+	password = generatePasswordHash(password)
+
+	value, err := json.Marshal(&entity.UserSessions{
+		Username:  username,
+		Password:  password,
+		CreatedAt: time.Now(),
+	})
+
+	if err != nil {
+		return "", fmt.Errorf("GetToken 2: %v", err)
+	}
+
+	expiration := time.Hour * 12
+
+	err = s.cache.SetCache(token, value, int32(expiration))
+	if err != nil {
+		return "", fmt.Errorf("GetToken 2: %v", err)
+	}
+	return token, nil
 }
 
 /*

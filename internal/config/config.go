@@ -23,7 +23,7 @@ func NewConfig() Config {
 	}
 
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		log.Fatal("config file does not exist: %s", configPath)
+		log.Fatalf("config file does not exist: %s", configPath)
 	}
 
 	var cfg Config

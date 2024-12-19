@@ -24,4 +24,5 @@ func CreateComplaintsHandler(complaintsProcessor *processors.ComplaintsProcessor
 // Функция InitRoutes инициализирует роуты. Принимает на вход переменную типа fiber.App
 func (h *ComplaintsHandler) InitRoutes(app *fiber.App) {
 	app.Post("user/register", h.signUp)
+	app.Post("user/login", h.signIn)
 }

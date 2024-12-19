@@ -14,10 +14,8 @@ type User struct {
 	Role      string    `json:"role"`
 }
 
-type userSessions struct {
-	Id        int       `json:"id"`
+type UserSessions struct {
 	Username  string    `json:"username"`
 	Password  string    `json:"password"`
-	Token     string    `json:"token"`
 	CreatedAt time.Time `json:"createdAt"`
 }

@@ -1,1 +1,1 @@
-env: "prod" #local, prod
+env: "local" #local, prod
