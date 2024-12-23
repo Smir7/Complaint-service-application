@@ -25,7 +25,7 @@ type tokenClaims struct {
 }
 
 type Authorization interface {
-	CreateUser(user entity.User) (int, error)
+	CreateUser(user entity.Users) (int, error)
 	GetToken(username, password string) (string, error)
 }
 
@@ -46,7 +46,7 @@ CreateUser проверяет на корректность полученные
 repo.CreateUser для создания пользователя. Принимает на вход структуру User,
 возвращает id типа int и ошибку типа error
 */
-func (s *AuthService) CreateUser(user entity.User) (int, error) {
+func (s *AuthService) CreateUser(user entity.Users) (int, error) {
 	user.User_UUID = uuid.NewV4()
 	if len(user.Password) == 0 || len(user.Username) == 0 {
 		return 0, fmt.Errorf("имя пользователя или пароль не могут быть пустыми")

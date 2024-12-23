@@ -15,7 +15,7 @@ const (
 )
 
 func (h *ComplaintsHandler) signUp(c *fiber.Ctx) {
-	var input entity.User
+	var input entity.Users
 
 	if err := c.BodyParser(&input); err != nil {
 		err = c.Status(fiber.StatusBadRequest).JSONP(

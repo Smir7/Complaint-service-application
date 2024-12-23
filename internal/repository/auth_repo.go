@@ -8,8 +8,8 @@ import (
 )
 
 type Authorization interface {
-	CreateUser(user entity.User) (int, error)
-	GetUser(username, password string) (entity.User, error)
+	CreateUser(user entity.Users) (int, error)
+	GetUser(username, password string) (entity.Users, error)
 }
 
 type AuthPostgres struct {
@@ -25,7 +25,7 @@ func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
 CreateUser отправляет INSERT запрос в базу данных для создания пользователя. Принимает на вход структуру User,
 возвращает переменные id типа int и err типа error
 */
-func (r *AuthPostgres) CreateUser(user entity.User) (int, error) {
+func (r *AuthPostgres) CreateUser(user entity.Users) (int, error) {
 	var id int
 	query := fmt.Sprintf("INSERT INTO users (user_uuid,username,password,role) values($1,$2,$3,$4) RETURNING id")
 	row := r.db.QueryRow(query, user.User_UUID, user.Username, user.Password, user.Role)
@@ -39,8 +39,8 @@ func (r *AuthPostgres) CreateUser(user entity.User) (int, error) {
 GetUser отправляет SELECT запрос в базу данных для получения данных пользователя. Принимает на вход username и password,
 возвращает структуру User и ошибку типа error
 */
-func (r *AuthPostgres) GetUser(username, password string) (entity.User, error) {
-	var user entity.User
+func (r *AuthPostgres) GetUser(username, password string) (entity.Users, error) {
+	var user entity.Users
 	query := fmt.Sprintf("SELECT id FROM %s WHERE username=$1 AND password=$2", usersTable)
 	err := r.db.Get(&user, query, username, password)
 
