@@ -25,6 +25,7 @@ func main() {
 	*/
 
 	cfg := config.NewConfig()
+
 	str := slog.String("env", cfg.Env)
 	l.SetupLogger(cfg.Env)
 	l.Log.Info("Starting project", str)

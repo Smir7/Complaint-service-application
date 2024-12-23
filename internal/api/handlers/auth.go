@@ -10,22 +10,17 @@ import (
 
 const (
 	successfulReg = "успешная регистрация"
-	badRequest    = "неправильные данные запроса"
+	badRequest    = "incorrect request"
 	serverError   = "ошибка севера"
 )
 
 func (h *ComplaintsHandler) signUp(c *fiber.Ctx) {
 	var input entity.User
 
-	type Response struct {
-		ID     int    `json:"id"`
-		Status string `json:"status"`
-	}
-
 	if err := c.BodyParser(&input); err != nil {
 		err = c.Status(fiber.StatusBadRequest).JSONP(
-			Response{
-				ID:     0,
+			entity.ResponseSignUp{
+				Id:     0,
 				Status: badRequest,
 			})
 		if err != nil {
@@ -38,8 +33,8 @@ func (h *ComplaintsHandler) signUp(c *fiber.Ctx) {
 
 	if err != nil {
 		err = c.Status(fiber.StatusInternalServerError).JSONP(
-			Response{
-				ID:     0,
+			entity.ResponseSignUp{
+				Id:     0,
 				Status: fmt.Sprintf("%v: %v", serverError, err),
 			})
 		if err != nil {
@@ -49,8 +44,8 @@ func (h *ComplaintsHandler) signUp(c *fiber.Ctx) {
 	}
 
 	err = c.Status(fiber.StatusOK).JSONP(
-		Response{
-			ID:     id,
+		entity.ResponseSignUp{
+			Id:     id,
 			Status: successfulReg,
 		})
 	if err != nil {
@@ -61,14 +56,9 @@ func (h *ComplaintsHandler) signUp(c *fiber.Ctx) {
 func (h *ComplaintsHandler) signIn(c *fiber.Ctx) {
 	var input entity.User
 
-	type Response struct {
-		Token  string `json:"token"`
-		Status string `json:"status"`
-	}
-
 	if err := c.BodyParser(&input); err != nil {
 		err = c.Status(fiber.StatusBadRequest).JSONP(
-			Response{
+			entity.ResponseSignIn{
 				Token:  "",
 				Status: badRequest,
 			})
@@ -80,7 +70,7 @@ func (h *ComplaintsHandler) signIn(c *fiber.Ctx) {
 	token, err := h.complaintsProcessor.Authorization.GetToken(input.Username, input.Password)
 	if err != nil {
 		err = c.Status(fiber.StatusInternalServerError).JSONP(
-			Response{
+			entity.ResponseSignIn{
 				Token:  "",
 				Status: fmt.Sprintf("%v: %v", serverError, err),
 			})
@@ -91,7 +81,7 @@ func (h *ComplaintsHandler) signIn(c *fiber.Ctx) {
 	}
 
 	err = c.Status(fiber.StatusOK).JSONP(
-		Response{
+		entity.ResponseSignIn{
 			Token:  token,
 			Status: successfulReg,
 		})

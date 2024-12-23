@@ -15,7 +15,8 @@ import (
 const (
 	salt       = "afdafadfadfadf"
 	signingKey = "qrkjk#4#35FSFJlja#4353KSFjH"
-	tokenTTL   = 12 * time.Hour
+	tokenTTL   = time.Hour * 12
+	expiration = 3600
 )
 
 type tokenClaims struct {
@@ -29,19 +30,20 @@ type Authorization interface {
 }
 
 type AuthService struct {
-	repo  repository.Authorization
-	cache repository.Cache
+	repo         repository.Authorization
+	SessionCache repository.SessionCache
 }
 
-// Функция NewAuthService является конструктором структуры AuthService. Принимает на вход переменную типа repository.Authorization и возвращает AuthService
+// NewAuthService является конструктором структуры AuthService. Принимает на вход переменную типа repository.Authorization и возвращает AuthService
 func NewAuthService(repo repository.Authorization) *AuthService {
-	return &AuthService{repo: repo,
-		cache: *repository.NewCache()}
+	return &AuthService{
+		repo:         repo,
+		SessionCache: *repository.NewSessionCache()}
 }
 
 /*
-	Функция CreateUser проверяет на корректность полученные от пользователя данные и вызывает функцию repo.CreateUser для создания пользователя. Принимает на вход структуру User,
-
+CreateUser проверяет на корректность полученные от пользователя данные и вызывает функцию
+repo.CreateUser для создания пользователя. Принимает на вход структуру User,
 возвращает id типа int и ошибку типа error
 */
 func (s *AuthService) CreateUser(user entity.User) (int, error) {
@@ -53,6 +55,10 @@ func (s *AuthService) CreateUser(user entity.User) (int, error) {
 	return s.repo.CreateUser(user)
 }
 
+/*
+GenerateToken генерирует JWT токен пользователя. Принимает на вход структуру username и password,
+возвращает JWT токен типа string и ошибку.
+*/
 func (s *AuthService) GenerateToken(username, password string) (string, error) {
 	user, err := s.repo.GetUser(username, generatePasswordHash(password))
 	if err != nil {
@@ -70,6 +76,10 @@ func (s *AuthService) GenerateToken(username, password string) (string, error) {
 	return token.SignedString([]byte(signingKey))
 }
 
+/*
+GetToken получает JWT токен из функции GetToken и сохраняет в кеш. Принимает на вход структуру username и password,
+возвращает JWT токен типа string и ошибку.
+*/
 func (s *AuthService) GetToken(username, password string) (string, error) {
 	token, err := s.GenerateToken(username, password)
 	if err != nil {
@@ -88,18 +98,18 @@ func (s *AuthService) GetToken(username, password string) (string, error) {
 		return "", fmt.Errorf("GetToken 2: %v", err)
 	}
 
-	expiration := time.Hour * 12
-
-	err = s.cache.SetCache(token, value, int32(expiration))
+	err = s.SessionCache.Set(token, value, int32(expiration))
 	if err != nil {
 		return "", fmt.Errorf("GetToken 2: %v", err)
 	}
+
 	return token, nil
 }
 
 /*
-Функция generatePasswordHash создаёт хеш пороля. Принимает на вход переменную password типа string возвращает хешированный пароль типа string
+generatePasswordHash создаёт хеш пороля. Принимает на вход переменную password типа string возвращает хешированный пароль типа string
 */
+
 func generatePasswordHash(password string) string {
 	hash := sha256.New()
 	hash.Write([]byte(password))

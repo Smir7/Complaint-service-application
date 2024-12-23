@@ -16,13 +16,14 @@ type AuthPostgres struct {
 	db *sqlx.DB
 }
 
-// Функция NewAuthPostgres является конструктором структуры AuthPostgres. Принимает на вход переменную типа sqlx.DB и возвращает AuthPostgres
+// NewAuthPostgres является конструктором структуры AuthPostgres. Принимает на вход переменную типа sqlx.DB и возвращает AuthPostgres
 func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
 	return &AuthPostgres{db: db}
 }
 
 /*
-Функция CreateUser отправляет INSERT запрос в базу данных для создания пользователя. Принимает на вход структуру User, возвращает переменные id типа int и err типа error
+CreateUser отправляет INSERT запрос в базу данных для создания пользователя. Принимает на вход структуру User,
+возвращает переменные id типа int и err типа error
 */
 func (r *AuthPostgres) CreateUser(user entity.User) (int, error) {
 	var id int
@@ -34,6 +35,10 @@ func (r *AuthPostgres) CreateUser(user entity.User) (int, error) {
 	return id, nil
 }
 
+/*
+GetUser отправляет SELECT запрос в базу данных для получения данных пользователя. Принимает на вход username и password,
+возвращает структуру User и ошибку типа error
+*/
 func (r *AuthPostgres) GetUser(username, password string) (entity.User, error) {
 	var user entity.User
 	query := fmt.Sprintf("SELECT id FROM %s WHERE username=$1 AND password=$2", usersTable)

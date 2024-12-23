@@ -12,6 +12,7 @@ const (
 	reportsTable = "reports"
 )
 
+// NewPostgresDB создаёт подключение к базе данных. Возвращает sqlx.DB и error
 func NewPostgresDB() (*sqlx.DB, error) {
 	dbConnectString := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
 		"localhost", "5432", "postgres", "complaint_service", "qwerty", "disable")

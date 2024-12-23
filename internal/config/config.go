@@ -3,11 +3,12 @@ package config
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-	"log"
-	"os"
 )
 
 type Config struct {
@@ -22,6 +23,8 @@ type ENVConfig struct {
 	DBDbname   string `env:"DB_DBNAME"`
 	AppPort    string `env:"APP_PORT"`
 	AppEnv     string `env:"APP_ENV"`
+	CacheHost  string `env:"CACHE_HOST"`
+	CachePort  string `env:"CACHE_PORT"`
 }
 
 func NewConfig() Config {
@@ -82,6 +85,14 @@ func LoadEnv() (ENVConfig, error) {
 	if appEnv == "" {
 		return ENVConfig{}, fmt.Errorf("APP_ENV is not set")
 	}
+	cacheHost := os.Getenv("CACHE_HOST")
+	if dbHost == "" {
+		return ENVConfig{}, fmt.Errorf("cache_HOST is not set")
+	}
+	cachePort := os.Getenv("CACHE_PORT")
+	if dbHost == "" {
+		return ENVConfig{}, fmt.Errorf("cache_PORT is not set")
+	}
 
 	connStr := fmt.Sprintf(
 		"host=%s port=%s name=%s user=%s password=%s app_port=%s app_env=%s",
@@ -93,6 +104,8 @@ func LoadEnv() (ENVConfig, error) {
 		dbPort,
 		appEnv,
 	)
+
+	fmt.Println("connStr=%v", connStr)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return ENVConfig{}, fmt.Errorf("error connecting to database: %w", err)
@@ -108,5 +121,7 @@ func LoadEnv() (ENVConfig, error) {
 		DBDbname:   dbName,
 		AppPort:    appPort,
 		AppEnv:     appEnv,
+		CacheHost:  cacheHost,
+		CachePort:  cachePort,
 	}, nil
 }
