@@ -1,8 +1,12 @@
 package processors
 
-import "complaint_service/internal/repository"
+import (
+	"complaint_service/internal/entity"
+	"complaint_service/internal/repository"
+)
 
 type ComplaintsRepository interface {
+	FindUsers(UserUUID string) ([]*entity.Users, error)
 	//имплиментируются методы из repository
 }
 
@@ -14,6 +18,10 @@ func CreateComplaintsProcessor(complaintsRepository *repository.ComplaintsReposi
 	return &ComplaintsProcessor{
 		Authorization: NewAuthService(complaintsRepository.Authorization),
 	}
+}
+
+func (p *ComplaintsProcessor) FindUsers(UserUUID string) (entity.Users, error) {
+	return p.FindUsers(UserUUID)
 }
 
 // Ниже будут методы ComplaintsProcessor, которые реализуют бизнес логику вызываются из хендлеров
