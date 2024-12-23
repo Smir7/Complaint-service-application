@@ -28,7 +28,7 @@ CreateUser отправляет INSERT запрос в базу данных д�
 func (r *AuthPostgres) CreateUser(user entity.Users) (int, error) {
 	var id int
 	query := fmt.Sprintf("INSERT INTO users (user_uuid,username,password,role) values($1,$2,$3,$4) RETURNING id")
-	row := r.db.QueryRow(query, user.User_UUID, user.Username, user.Password, user.Role)
+	row := r.db.QueryRow(query, user.UserUUID, user.Username, user.Password, user.Role)
 	if err := row.Scan(&id); err != nil {
 		return 0, err
 	}

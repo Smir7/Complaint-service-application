@@ -34,8 +34,6 @@ func (h *ComplaintsHandler) FindUsers(c *fiber2.Ctx) error {
 	}
 	return c.Status(fiber.StatusOK).JSON(res)
 }
-
-// Функция InitRoutes инициализирует роуты. Принимает на вход переменную типа fiber.App
 func (h *ComplaintsHandler) InitRoutes(app *fiber.App) {
 	app.Post("user/register", h.signUp)
 	app.Post("user/login", h.signIn)
