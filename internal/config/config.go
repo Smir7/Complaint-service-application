@@ -16,15 +16,17 @@ type Config struct {
 }
 
 type ENVConfig struct {
-	DBHost     string `env:"DB_HOST"`
-	DBPort     string `env:"DB_PORT"`
-	DBUser     string `env:"DB_USER"`
-	DBPassword string `env:"DB_PASSWORD"`
-	DBDbname   string `env:"DB_DBNAME"`
-	AppPort    string `env:"APP_PORT"`
-	AppEnv     string `env:"APP_ENV"`
-	CacheHost  string `env:"CACHE_HOST"`
-	CachePort  string `env:"CACHE_PORT"`
+	DBHost        string `env:"DB_HOST"`
+	DBPort        string `env:"DB_PORT"`
+	DBUser        string `env:"DB_USER"`
+	DBPassword    string `env:"DB_PASSWORD"`
+	DBDbname      string `env:"DB_DBNAME"`
+	AppPort       string `env:"APP_PORT"`
+	AppEnv        string `env:"APP_ENV"`
+	CacheHost     string `env:"CACHE_HOST"`
+	CachePort     string `env:"CACHE_PORT"`
+	JwtSalt       string `env:"JWT_Salt"`
+	JwtSigningKey string `env:"JWT_SigningKey"`
 }
 
 func NewConfig() Config {
@@ -93,19 +95,25 @@ func LoadEnv() (ENVConfig, error) {
 	if dbHost == "" {
 		return ENVConfig{}, fmt.Errorf("cache_PORT is not set")
 	}
+	jwtSalt := os.Getenv("JWT_Salt")
+	if jwtSalt == "" {
+		return ENVConfig{}, fmt.Errorf("JWT_Salt is not set")
+	}
+	jwtSigningKey := os.Getenv("JWT_SigningKey")
+	if jwtSigningKey == "" {
+		return ENVConfig{}, fmt.Errorf("JWT_SigningKey is not set")
+	}
 
 	connStr := fmt.Sprintf(
-		"host=%s port=%s name=%s user=%s password=%s app_port=%s app_env=%s",
+		"host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
 		dbHost,
 		dbPort,
-		dbName,
 		dbUser,
+		dbName,
 		dbPassword,
-		dbPort,
 		appEnv,
 	)
 
-	fmt.Println("connStr=%v", connStr)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return ENVConfig{}, fmt.Errorf("error connecting to database: %w", err)
@@ -114,14 +122,16 @@ func LoadEnv() (ENVConfig, error) {
 		return ENVConfig{}, err
 	}
 	return ENVConfig{
-		DBHost:     dbHost,
-		DBPort:     dbPort,
-		DBUser:     dbUser,
-		DBPassword: dbPassword,
-		DBDbname:   dbName,
-		AppPort:    appPort,
-		AppEnv:     appEnv,
-		CacheHost:  cacheHost,
-		CachePort:  cachePort,
+		DBHost:        dbHost,
+		DBPort:        dbPort,
+		DBUser:        dbUser,
+		DBPassword:    dbPassword,
+		DBDbname:      dbName,
+		AppPort:       appPort,
+		AppEnv:        appEnv,
+		CacheHost:     cacheHost,
+		CachePort:     cachePort,
+		JwtSalt:       jwtSalt,
+		JwtSigningKey: jwtSigningKey,
 	}, nil
 }

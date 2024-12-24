@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"complaint_service/internal/entity"
+	"complaint_service/internal/models"
 	"fmt"
 	"log"
 
@@ -19,7 +20,7 @@ func (h *ComplaintsHandler) signUp(c *fiber.Ctx) {
 
 	if err := c.BodyParser(&input); err != nil {
 		err = c.Status(fiber.StatusBadRequest).JSONP(
-			entity.ResponseSignUp{
+			models.ResponseSignUp{
 				Id:     0,
 				Status: badRequest,
 			})
@@ -33,7 +34,7 @@ func (h *ComplaintsHandler) signUp(c *fiber.Ctx) {
 
 	if err != nil {
 		err = c.Status(fiber.StatusInternalServerError).JSONP(
-			entity.ResponseSignUp{
+			models.ResponseSignUp{
 				Id:     0,
 				Status: fmt.Sprintf("%v: %v", serverError, err),
 			})
@@ -44,7 +45,7 @@ func (h *ComplaintsHandler) signUp(c *fiber.Ctx) {
 	}
 
 	err = c.Status(fiber.StatusOK).JSONP(
-		entity.ResponseSignUp{
+		models.ResponseSignUp{
 			Id:     id,
 			Status: successfulReg,
 		})
@@ -58,7 +59,7 @@ func (h *ComplaintsHandler) signIn(c *fiber.Ctx) {
 
 	if err := c.BodyParser(&input); err != nil {
 		err = c.Status(fiber.StatusBadRequest).JSONP(
-			entity.ResponseSignIn{
+			models.ResponseSignIn{
 				Token:  "",
 				Status: badRequest,
 			})
@@ -70,7 +71,7 @@ func (h *ComplaintsHandler) signIn(c *fiber.Ctx) {
 	token, err := h.complaintsProcessor.Authorization.GetToken(input.Username, input.Password)
 	if err != nil {
 		err = c.Status(fiber.StatusInternalServerError).JSONP(
-			entity.ResponseSignIn{
+			models.ResponseSignIn{
 				Token:  "",
 				Status: fmt.Sprintf("%v: %v", serverError, err),
 			})
@@ -81,7 +82,7 @@ func (h *ComplaintsHandler) signIn(c *fiber.Ctx) {
 	}
 
 	err = c.Status(fiber.StatusOK).JSONP(
-		entity.ResponseSignIn{
+		models.ResponseSignIn{
 			Token:  token,
 			Status: successfulReg,
 		})

@@ -1,7 +1,9 @@
 package processors
 
 import (
+	"complaint_service/internal/config"
 	"complaint_service/internal/entity"
+	"complaint_service/internal/models"
 	"complaint_service/internal/repository"
 	"crypto/sha256"
 	"encoding/json"
@@ -13,8 +15,6 @@ import (
 )
 
 const (
-	salt       = "afdafadfadfadf"
-	signingKey = "qrkjk#4#35FSFJlja#4353KSFjH"
 	tokenTTL   = time.Hour * 12
 	expiration = 3600
 )
@@ -60,6 +60,10 @@ GenerateToken генерирует JWT токен пользователя. Пр
 возвращает JWT токен типа string и ошибку.
 */
 func (s *AuthService) GenerateToken(username, password string) (string, error) {
+	configs, err := config.LoadEnv()
+	if err != nil {
+		fmt.Println(err)
+	}
 	user, err := s.repo.GetUser(username, generatePasswordHash(password))
 	if err != nil {
 		return "", fmt.Errorf("GenerateToken: %v", err)
@@ -73,7 +77,7 @@ func (s *AuthService) GenerateToken(username, password string) (string, error) {
 		user.User_UUID,
 	})
 
-	return token.SignedString([]byte(signingKey))
+	return token.SignedString([]byte(configs.JwtSigningKey))
 }
 
 /*
@@ -88,7 +92,7 @@ func (s *AuthService) GetToken(username, password string) (string, error) {
 
 	password = generatePasswordHash(password)
 
-	value, err := json.Marshal(&entity.UserSessions{
+	value, err := json.Marshal(&models.UserSessions{
 		Username:  username,
 		Password:  password,
 		CreatedAt: time.Now(),
@@ -100,7 +104,7 @@ func (s *AuthService) GetToken(username, password string) (string, error) {
 
 	err = s.SessionCache.Set(token, value, int32(expiration))
 	if err != nil {
-		return "", fmt.Errorf("GetToken 2: %v", err)
+		return "", fmt.Errorf("GetToken 3: %v", err)
 	}
 
 	return token, nil
@@ -111,8 +115,12 @@ generatePasswordHash создаёт хеш пороля. Принимает на
 */
 
 func generatePasswordHash(password string) string {
+	configs, err := config.LoadEnv()
+	if err != nil {
+		fmt.Println(err)
+	}
 	hash := sha256.New()
 	hash.Write([]byte(password))
 
-	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+	return fmt.Sprintf("%x", hash.Sum([]byte(configs.JwtSalt)))
 }
