@@ -10,7 +10,7 @@ import (
 
 type Authorization interface {
 	CreateUser(user models.UserSignUp) (int, error)
-	GetUser(username, password string) (entity.User, error)
+	GetUser(username, password string) (entity.Users, error)
 }
 
 type AuthPostgres struct {
@@ -34,14 +34,14 @@ func (r *AuthPostgres) CreateUser(userModel models.UserSignUp) (int, error) {
 		return 0, err
 	}
 
-	user := entity.User{
-		Username:  userModel.Username,
-		Password:  userModel.Password,
-		User_UUID: userModel.User_UUID,
-		Role:      userModel.Role,
+	user := entity.Users{
+		UserName: userModel.UserName,
+		Password: userModel.Password,
+		UserUUID: userModel.UserUUID,
+		Role:     entity.Role(userModel.Role),
 	}
 	query := fmt.Sprintf("INSERT INTO users (user_uuid,username,password,role) values($1,$2,$3,$4) RETURNING id")
-	row := tx.QueryRow(query, user.User_UUID, user.Username, user.Password, user.Role)
+	row := tx.QueryRow(query, user.UserUUID, user.UserName, user.Password, user.Role)
 	if err := row.Scan(&id); err != nil {
 		tx.Rollback()
 		return 0, err
@@ -55,8 +55,8 @@ func (r *AuthPostgres) CreateUser(userModel models.UserSignUp) (int, error) {
 GetUser отправляет SELECT запрос в базу данных для получения данных пользователя. Принимает на вход username и password,
 возвращает структуру User и ошибку типа error
 */
-func (r *AuthPostgres) GetUser(username, password string) (entity.User, error) {
-	var user entity.User
+func (r *AuthPostgres) GetUser(username, password string) (entity.Users, error) {
+	var user entity.Users
 	query := fmt.Sprintf("SELECT id FROM %s WHERE username=$1 AND password=$2", usersTable)
 	err := r.db.Get(&user, query, username, password)
 

@@ -6,6 +6,13 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
+type Role string
+
+const (
+	User  Role = "USER"
+	Admin Role = "ADMIN"
+)
+
 type UserSessions struct {
 	Username  string    `json:"username"`
 	Password  string    `json:"password"`
@@ -23,8 +30,8 @@ type ResponseSignIn struct {
 }
 
 type UserSignUp struct {
-	User_UUID uuid.UUID `json:"user_UUID"`
-	Username  string    `json:"username"`
-	Password  string    `json:"password"`
-	Role      string    `json:"role"`
+	UserUUID uuid.UUID `json:"user_UUID"`
+	UserName string    `json:"username"`
+	Password string    `json:"password"`
+	Role     Role      `json:"role"`
 }

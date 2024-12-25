@@ -29,6 +29,8 @@ func (h *ComplaintsHandler) signUp(c *fiber.Ctx) {
 		return
 	}
 
+	fmt.Println("Выполнилось 1", input)
+
 	id, err := h.complaintsProcessor.Authorization.CreateUser(input)
 
 	if err != nil {
@@ -67,7 +69,7 @@ func (h *ComplaintsHandler) signIn(c *fiber.Ctx) {
 		}
 		return
 	}
-	token, err := h.complaintsProcessor.Authorization.GetToken(input.Username, input.Password)
+	token, err := h.complaintsProcessor.Authorization.GetToken(input.UserName, input.Password)
 	if err != nil {
 		err = c.Status(fiber.StatusInternalServerError).JSONP(
 			models.ResponseSignIn{

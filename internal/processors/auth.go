@@ -46,11 +46,14 @@ repo.CreateUser для создания пользователя. Принима
 возвращает id типа int и ошибку типа error
 */
 func (s *AuthService) CreateUser(user models.UserSignUp) (int, error) {
-	user.User_UUID = uuid.NewV4()
-	if len(user.Password) == 0 || len(user.Username) == 0 {
+	user.UserUUID = uuid.NewV4()
+	fmt.Println("Выполнилось 2")
+
+	if len(user.Password) == 0 || len(user.UserName) == 0 {
 		return 0, fmt.Errorf("имя пользователя или пароль не могут быть пустыми")
 	}
 	user.Password = generatePasswordHash(user.Password)
+	fmt.Println("Выполнилось 3")
 	return s.repo.CreateUser(user)
 }
 
@@ -73,7 +76,7 @@ func (s *AuthService) GenerateToken(username, password string) (string, error) {
 			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
-		user.User_UUID,
+		user.UserUUID,
 	})
 
 	return token.SignedString([]byte(configs.JwtSigningKey))
