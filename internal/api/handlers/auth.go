@@ -29,8 +29,6 @@ func (h *ComplaintsHandler) signUp(c *fiber.Ctx) {
 		return
 	}
 
-	fmt.Println("Выполнилось 1", input)
-
 	id, err := h.complaintsProcessor.Authorization.CreateUser(input)
 
 	if err != nil {

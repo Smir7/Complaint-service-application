@@ -47,13 +47,10 @@ repo.CreateUser для создания пользователя. Принима
 */
 func (s *AuthService) CreateUser(user models.UserSignUp) (int, error) {
 	user.UserUUID = uuid.NewV4()
-	fmt.Println("Выполнилось 2")
-
 	if len(user.Password) == 0 || len(user.UserName) == 0 {
 		return 0, fmt.Errorf("имя пользователя или пароль не могут быть пустыми")
 	}
 	user.Password = generatePasswordHash(user.Password)
-	fmt.Println("Выполнилось 3")
 	return s.repo.CreateUser(user)
 }
 
