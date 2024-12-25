@@ -2,7 +2,6 @@ package processors
 
 import (
 	"complaint_service/internal/config"
-	"complaint_service/internal/entity"
 	"complaint_service/internal/models"
 	"complaint_service/internal/repository"
 	"crypto/sha256"
@@ -25,7 +24,7 @@ type tokenClaims struct {
 }
 
 type Authorization interface {
-	CreateUser(user entity.User) (int, error)
+	CreateUser(user models.UserSignUp) (int, error)
 	GetToken(username, password string) (string, error)
 }
 
@@ -46,7 +45,7 @@ CreateUser проверяет на корректность полученные
 repo.CreateUser для создания пользователя. Принимает на вход структуру User,
 возвращает id типа int и ошибку типа error
 */
-func (s *AuthService) CreateUser(user entity.User) (int, error) {
+func (s *AuthService) CreateUser(user models.UserSignUp) (int, error) {
 	user.User_UUID = uuid.NewV4()
 	if len(user.Password) == 0 || len(user.Username) == 0 {
 		return 0, fmt.Errorf("имя пользователя или пароль не могут быть пустыми")

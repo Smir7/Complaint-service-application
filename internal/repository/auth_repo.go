@@ -2,13 +2,14 @@ package repository
 
 import (
 	"complaint_service/internal/entity"
+	"complaint_service/internal/models"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
 )
 
 type Authorization interface {
-	CreateUser(user entity.User) (int, error)
+	CreateUser(user models.UserSignUp) (int, error)
 	GetUser(username, password string) (entity.User, error)
 }
 
@@ -25,13 +26,28 @@ func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
 CreateUser отправляет INSERT запрос в базу данных для создания пользователя. Принимает на вход структуру User,
 возвращает переменные id типа int и err типа error
 */
-func (r *AuthPostgres) CreateUser(user entity.User) (int, error) {
+func (r *AuthPostgres) CreateUser(userModel models.UserSignUp) (int, error) {
 	var id int
-	query := fmt.Sprintf("INSERT INTO users (user_uuid,username,password,role) values($1,$2,$3,$4) RETURNING id")
-	row := r.db.QueryRow(query, user.User_UUID, user.Username, user.Password, user.Role)
-	if err := row.Scan(&id); err != nil {
+
+	tx, err := r.db.Begin()
+	if err != nil {
 		return 0, err
 	}
+
+	user := entity.User{
+		Username:  userModel.Username,
+		Password:  userModel.Password,
+		User_UUID: userModel.User_UUID,
+		Role:      userModel.Role,
+	}
+	query := fmt.Sprintf("INSERT INTO users (user_uuid,username,password,role) values($1,$2,$3,$4) RETURNING id")
+	row := tx.QueryRow(query, user.User_UUID, user.Username, user.Password, user.Role)
+	if err := row.Scan(&id); err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+	tx.Commit()
+
 	return id, nil
 }
 

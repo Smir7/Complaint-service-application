@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	uuid "github.com/satori/go.uuid"
+)
 
 type UserSessions struct {
 	Username  string    `json:"username"`
@@ -16,4 +20,11 @@ type ResponseSignUp struct {
 type ResponseSignIn struct {
 	Token  string `json:"token"`
 	Status string `json:"status"`
+}
+
+type UserSignUp struct {
+	User_UUID uuid.UUID `json:"user_UUID"`
+	Username  string    `json:"username"`
+	Password  string    `json:"password"`
+	Role      string    `json:"role"`
 }

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"complaint_service/internal/entity"
 	"complaint_service/internal/models"
 	"fmt"
 	"log"
@@ -16,7 +15,7 @@ const (
 )
 
 func (h *ComplaintsHandler) signUp(c *fiber.Ctx) {
-	var input entity.User
+	var input models.UserSignUp
 
 	if err := c.BodyParser(&input); err != nil {
 		err = c.Status(fiber.StatusBadRequest).JSONP(
@@ -55,7 +54,7 @@ func (h *ComplaintsHandler) signUp(c *fiber.Ctx) {
 }
 
 func (h *ComplaintsHandler) signIn(c *fiber.Ctx) {
-	var input entity.User
+	var input models.UserSignUp
 
 	if err := c.BodyParser(&input); err != nil {
 		err = c.Status(fiber.StatusBadRequest).JSONP(
