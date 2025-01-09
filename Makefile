@@ -31,3 +31,11 @@ m-status:
 	GOOSE_DBSTRING=$(GOOSE_DBSTRING) \
 	goose -dir $(GOOSE_MIGRATION_DIR) \
 	status
+
+#build создаёт образ по docker-compose-файлу
+build:
+	docker-compose build 
+
+#run-local запускает контейнеры по docker-compose-файлу
+run-local:
+	docker-compose up
