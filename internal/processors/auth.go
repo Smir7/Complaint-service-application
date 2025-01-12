@@ -65,7 +65,7 @@ func (s *AuthService) GenerateToken(username, password string) (string, error) {
 	}
 	user, err := s.repo.GetUser(username, generatePasswordHash(password))
 	if err != nil {
-		return "", fmt.Errorf("GenerateToken: %v", err)
+		return "", err
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
@@ -84,9 +84,12 @@ GetToken получает JWT токен из функции GetToken и сох�
 возвращает JWT токен типа string и ошибку.
 */
 func (s *AuthService) GetToken(username, password string) (string, error) {
+	if len(password) == 0 || len(username) == 0 {
+		return "", fmt.Errorf("имя пользователя или пароль не могут быть пустыми")
+	}
 	token, err := s.GenerateToken(username, password)
 	if err != nil {
-		return "", fmt.Errorf("GetToken 1: %v", err)
+		return "", err
 	}
 
 	password = generatePasswordHash(password)
@@ -98,12 +101,12 @@ func (s *AuthService) GetToken(username, password string) (string, error) {
 	})
 
 	if err != nil {
-		return "", fmt.Errorf("GetToken 2: %v", err)
+		return "", err
 	}
 
 	err = s.SessionCache.Set(token, value, int32(expiration))
 	if err != nil {
-		return "", fmt.Errorf("GetToken 3: %v", err)
+		return "", err
 	}
 
 	return token, nil

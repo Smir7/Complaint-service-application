@@ -38,7 +38,7 @@ func (r *AuthPostgres) CreateUser(userModel models.UserSignUp) (int, error) {
 		UserName: userModel.UserName,
 		Password: userModel.Password,
 		UserUUID: userModel.UserUUID,
-		Role:     entity.Role(userModel.Role),
+		Role:     entity.Role(models.User),
 	}
 	query := fmt.Sprintf("INSERT INTO users (user_uuid,username,password,role) values($1,$2,$3,$4) RETURNING id")
 	row := tx.QueryRow(query, user.UserUUID, user.UserName, user.Password, user.Role)

@@ -23,6 +23,7 @@ func NewPostgresDB() (*sqlx.DB, error) {
 	dbConnectString := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
 		configs.DBHost, configs.DBPort, configs.DBUser, configs.DBDbname, configs.DBPassword, "disable")
 
+	fmt.Println(dbConnectString)
 	db, err := sqlx.Open("postgres", dbConnectString)
 	if err != nil {
 		return nil, err

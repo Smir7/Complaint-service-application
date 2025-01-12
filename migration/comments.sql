@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS comments (
 	comment VARCHAR(255),
 	created_at DATE NOT NULL DEFAULT CURRENT_DATE,
 	updated_at DATE NOT NULL DEFAULT CURRENT_DATE
+	FOREIGN KEY (report_id) REFERENCES reports (Id)
 );
 -- +goose StatementEnd
 

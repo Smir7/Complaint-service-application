@@ -11,7 +11,7 @@ import (
 const (
 	successfulReg = "успешная регистрация"
 	badRequest    = "incorrect request"
-	serverError   = "ошибка севера"
+	serverError   = "ошибка сервера"
 )
 
 func (h *ComplaintsHandler) signUp(c *fiber.Ctx) {
