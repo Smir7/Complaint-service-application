@@ -30,17 +30,17 @@ type ENVConfig struct {
 }
 
 func NewConfig() Config {
-	err := godotenv.Load()
+	err := godotenv.Load() // создаём локальные переменные окружения из файла ./.env
 	if err != nil {
 		log.Fatal("error loading .env file")
 	}
-	configPath := os.Getenv("CONFIG_PATH")
+	configPath := os.Getenv("CONFIG_PATH") // берём конкретную переменную окружения для файла .env
 	if configPath == "" {
 		log.Fatal("CONFIG_PATH is not set")
 	}
 
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		log.Fatalf("config file does not exist: %s", configPath)
+	if _, err := os.Stat(configPath); os.IsNotExist(err) { // проверка, существует ли 2-й файл настроек
+		log.Fatal("config file does not exist: %s", configPath)
 	}
 
 	var cfg Config
@@ -48,10 +48,11 @@ func NewConfig() Config {
 	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
 		log.Fatalf("cannot read config: %s", &err)
 	}
+
 	return cfg
 }
 
-func LoadEnv() (ENVConfig, error) {
+func LoadEnv() (ENVConfig, error) { //незадействованная функция
 	err := godotenv.Load()
 
 	if err != nil {
@@ -113,6 +114,7 @@ func LoadEnv() (ENVConfig, error) {
 		dbPassword,
 		appEnv,
 	)
+	log.Println(connStr)
 
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {

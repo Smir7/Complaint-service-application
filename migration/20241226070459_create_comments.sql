@@ -1,5 +1,4 @@
 -- +goose Up
--- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS comments (
 	id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	report_id INT,
@@ -9,9 +8,6 @@ CREATE TABLE IF NOT EXISTS comments (
 	updated_at DATE NOT NULL DEFAULT CURRENT_DATE
 	FOREIGN KEY (report_id) REFERENCES reports (Id)
 );
--- +goose StatementEnd
 
 -- +goose Down
--- +goose StatementBegin
 DROP TABLE IF EXISTS comments;
--- +goose StatementEnd
