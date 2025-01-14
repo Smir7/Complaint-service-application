@@ -112,6 +112,47 @@ func (s *AuthService) GetToken(username, password string) (string, error) {
 	return token, nil
 }
 
+func (s *AuthService) ParseToken(token string) (uuid.UUID, error) {
+	result, err := s.SessionCache.Get(token)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	if result != nil {
+		userId, err := ParseJWT(token)
+		if err != nil {
+			return uuid.Nil, err
+		}
+		return userId, nil
+	}
+
+	return uuid.Nil, fmt.Errorf("срок действия сессии истёк")
+}
+
+func ParseJWT(accessToken string) (uuid.UUID, error) {
+	configs, err := config.LoadEnv()
+	if err != nil {
+		fmt.Println(err)
+	}
+	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("invalid signing method")
+		}
+
+		return []byte(configs.JwtSigningKey), nil
+	})
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	claims, ok := token.Claims.(*tokenClaims)
+	if !ok {
+		return uuid.Nil, fmt.Errorf("token claims are not of type *tokenClaims")
+	}
+
+	return claims.User_UUID, nil
+}
+
 /*
 generatePasswordHash создаёт хеш пороля. Принимает на вход переменную password типа string возвращает хешированный пароль типа string
 */
