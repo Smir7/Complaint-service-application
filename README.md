@@ -1,5 +1,3 @@
-# Masterskaya_Project_GO_1
-
 # Сервис подачи жалоб
 
 
